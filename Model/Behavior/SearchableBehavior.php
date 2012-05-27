@@ -208,15 +208,15 @@ class SearchableBehavior extends ModelBehavior {
 		$type       = $this->opt($Model, 'type');
 
 
-		$primKeyPath  = $Model->alias . '/' . $Model->primaryKey;
-		$labelKeyPath = $Model->alias . '/' . $Model->displayField;
+		$primKeyPath  = $Model->alias . '_' . $Model->primaryKey;
+		$labelKeyPath = $Model->alias . '_' . $Model->displayField;
 		if (!empty($Model->labelField)) {
-			$labelKeyPath = $Model->alias . '/' . $Model->labelField;
+			$labelKeyPath = $Model->alias . '_' . $Model->labelField;
 		}
 
 		$descKeyPath = false;
 		if (@$Model->descripField) {
-			$descKeyPath = $Model->alias . '/' . @$Model->descripField;
+			$descKeyPath = $Model->alias . '_' . @$Model->descripField;
 		}
 
 		$isQuery = is_string($params);
@@ -313,7 +313,7 @@ class SearchableBehavior extends ModelBehavior {
 			if ($isQuery) {
 				$doc = $result;
 			} else {
-				$doc = Set::flatten($result, '/');
+				$doc = Set::flatten($result, '_');
 			}
 
 			if (empty($doc[$primKeyPath])) {
@@ -590,7 +590,7 @@ class SearchableBehavior extends ModelBehavior {
 		if (is_string($r))  {
 			return $r;
 		}
-
+                
 		$results = array();
 		foreach ($r['hits']['hits'] as $hit) {
 			$results[] = array(
@@ -658,20 +658,20 @@ class SearchableBehavior extends ModelBehavior {
 					$modelFields = $matches[1];
 				}
 			} else {
-				$flats = Set::flatten($params, '/');
+				$flats = Set::flatten($params, '_');
 				foreach ($flats as $flat => $field) {
-					$flat = '/' . $flat;
-					if (false !== ($pos = strpos($flat, '/fields'))) {
+					$flat = '_' . $flat;
+					if (false !== ($pos = strpos($flat, '_fields'))) {
 						$flat   = substr($flat, 0, $pos);
-						$prefix = str_replace(array('/contain', '/fields', '/limit'), '' , $flat);
+						$prefix = str_replace(array('_contain', '_fields', '_limit'), '' , $flat);
 
 						if ($prefix === '') {
 							$prefix = $modelAlias;
 						}
 
-						$field  = $prefix . '/' . $field;
+						$field  = $prefix . '' . $field;
 
-						if (substr($field, 0, 1) === '/') {
+						if (substr($field, 0, 1) === '_') {
 							$field = substr($field, 1);
 						}
 
